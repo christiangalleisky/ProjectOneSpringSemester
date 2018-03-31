@@ -70,24 +70,6 @@ public abstract class SequenceSearch implements Presentable {
         }
         return sa;
     }
-    /**
-     * Static helper method, "adds" the given Strings s a String Array, by creating a new longer StringArray.
-     *
-     * @param a {@link String[]} source string array
-     * @param s {@link String} that needs to be added
-     * @return {@link String[]} newly created string array, containing all the elements from the provided array, plus the new string.
-     */
-    static int[] addsInteger(final int[] a, final int s) {
-        final int[] sa;
-        if (a!=null && 0<a.length) {
-            sa = new int[a.length + 1];
-            System.arraycopy(a, 0, sa, 0, a.length);
-            sa[a.length] = s;
-        } else {
-            sa = new int[]{s};
-        }
-        return sa;
-    }
 
     /**
      * @return {@link String[]} of all sub-string, within the content, which are enclosed, in startTag and endTag.
