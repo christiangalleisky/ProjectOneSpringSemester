@@ -1,5 +1,7 @@
 package edu.gcccd.csis;
 
+import java.util.regex.PatternSyntaxException;
+
 /**
  * @version 1.1
  * @author Christian Galleisky
@@ -22,19 +24,65 @@ public class  SequenceSearchImpl extends SequenceSearch {
      */
     @Override
     public String[] getAllTaggedSequences() {
-        String[] contentDelimitedByEndTags = content.split(endTag);
-        if (startTag.equals(endTag)) {
-            for (int i = 1; i < contentDelimitedByEndTags.length; i += 2) {
-                toBeReturned = SequenceSearch.adds(toBeReturned, contentDelimitedByEndTags[i]);
-            }
-        } else if (!startTag.equals(endTag)) {
-                for (String x : contentDelimitedByEndTags) {
-                    String[] elementNearestEndTag = x.split(startTag);
-                    toBeReturned = SequenceSearch.adds(toBeReturned, elementNearestEndTag[elementNearestEndTag.length - 1]);
+        try{
+            if(!startTag.equals(endTag)){
+                int reverseFlag = 0;
+                int lastKnownEndIndex = 0;
+                int startIndex;
+                int endIndex;
+                do {
+                    endIndex = content.indexOf(endTag , lastKnownEndIndex);
+                    lastKnownEndIndex = endIndex + endTag.length();
+                    int i = 0;
+                    if(endIndex > 0) {
+                        boolean control = true;
+                        while (control){
+                            startIndex = content.substring(endIndex - startTag.length() + i , endIndex + i).indexOf(startTag);
+                            if(startTag.length() == endTag.length()) {
+                                reverseFlag = content.substring(endIndex - endTag.length() + i , endIndex + i).indexOf(endTag);
+                            }else if (startTag.length() < endTag.length()){
+                                reverseFlag = content.substring(endIndex - endTag.length() + i + startTag.length() , endIndex + i).indexOf(endTag);
+                            }
+                            if(startIndex == 0 || reverseFlag == 0){
+                                control = false;
+                            }
+                            i--;
+                        }
+                        i++;
+                    }
+                    if(endIndex == -1){
+                        break;
+                    }
+                    if(reverseFlag == 0){
+                        continue;
+                    }else {
+                        toBeReturned = SequenceSearch.adds(toBeReturned, content.substring(endIndex + i, endIndex));
+                    }
+                }while(true);
+            }else{
+                /**
+                 * Demonstrate the use of regex delimiters. This is my third version of this project
+                 * and I'm very aware of how sensitive the program is to regex string values
+                 * from my experience building my second version of this project, which consisted of
+                 * only regex values to make it work. No do while loop, no substring method, and no
+                 * index of method. I left this here because for the tests it is the shortest possible
+                 * implementation and also a little nifty and fun to look at. Enjoy!
+                 */
+                String[] contentDelimitedByEndTags = content.split(endTag);
+                for (int i = 1; i < contentDelimitedByEndTags.length; i += 2) {
+                    toBeReturned = SequenceSearch.adds(toBeReturned, contentDelimitedByEndTags[i]);
                 }
             }
-        return toBeReturned;
+        }catch(IndexOutOfBoundsException e){
+            System.out.println("Error processing content string, check that it has at least TWO tags!");
+            System.exit(-1);
+        }catch(PatternSyntaxException p){
+            System.out.println("Error handling delimiters");
+            System.exit(-1);
         }
+            return toBeReturned;
+    }
+
 
 
         /**
@@ -43,14 +91,11 @@ public class  SequenceSearchImpl extends SequenceSearch {
         @Override
         public String getLongestTaggedSequence (){
             String[] holding = getAllTaggedSequences();
-            if(holding.length == 1){
-                holding = new String [0];
-            }
             if (holding.length > 1) {
                 String r = holding[0];
-                for (int i = 1; i < holding.length-1; i++) { //make this into an enhanced for statement
-                    if (holding[i].length() >= r.length()) {
-                        r = holding[i];
+                for (String x : holding) {
+                    if (x.length() >= r.length()) {
+                        r = x;
                     }
                 }
                 return r;
@@ -60,7 +105,8 @@ public class  SequenceSearchImpl extends SequenceSearch {
         }
 
         /**
-         * @return returns the string array produced by getAllTaggedSequences on new lines for each element displayed as "String : (Stringlength as an integer value)"
+         * @return returns the string array produced by getAllTaggedSequences on new lines for
+         * each element displayed as "String : (Stringlength as an integer value)"
          */
         @Override
         public String displayStringArray () {

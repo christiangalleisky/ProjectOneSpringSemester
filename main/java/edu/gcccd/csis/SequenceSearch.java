@@ -28,9 +28,9 @@ package edu.gcccd.csis;
  */
 public abstract class SequenceSearch implements Presentable {
 
-    String startTag;
-    String endTag;
-    String content;
+    final String startTag;
+    final String endTag;
+    final String content;
 
     /**
      * The one and only constructor
@@ -47,26 +47,9 @@ public abstract class SequenceSearch implements Presentable {
                 throw new IllegalArgumentException("Start and end tag are allowed to be the same, but otherwise must not contain each other.");
             }
         }
-        if(startTag.equals("{{")){
-            this.startTag = "\\{\\{";
-            System.out.println("A start tag equals {{");
-        }if(startTag.equals("}}")){
-            this.startTag = "\\}\\}";
-            System.out.println("A start tag equals }}");
-        }if(endTag.equals("{{")){
-            this.endTag = "\\{\\{";
-            System.out.println("An end tag equals {{");
-        }if(endTag.equals("}}")){
-            this.endTag = "\\}\\}";
-            System.out.println("An end tag equals }}");
-        }if(!startTag.equals("{{")){
-            this.startTag = startTag;
-            System.out.println("A start tag does NOT equal {{");
-        }if(!endTag.equals("}}")){
-            this.endTag = endTag;
-            System.out.println("An end tag does NOT equal }}");
-        }
         this.content = content;
+        this.startTag = startTag;
+        this.endTag = endTag;
     }
 
     /**
